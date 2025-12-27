@@ -29,9 +29,9 @@
     <!-- 休暇期間 -->
     <label>休暇期間</label>
     <div class="date-row">
-      <input type="date" id="start" required>
+      <input type="date" id="start" name="start" required>
       <span>〜</span>
-      <input type="date" id="end" required>
+      <input type="date" id="end" name="end" required>
     </div>
 
     <div class="days">
@@ -52,6 +52,16 @@
     <!-- その他入力 -->
     <textarea id="otherReason" name="other_reason"
       placeholder="理由を入力してください"></textarea>
+    
+    <label>種類</label>
+    <select name="vacation_type">
+      <option value="有給休暇" selected>有給休暇</option>
+      <option value="特別休暇">特別休暇</option>
+      <option value="欠勤">欠勤</option>
+    </select>
+
+    <label>備考</label>
+    <textarea name="note" rows="3" placeholder="自由記入"></textarea>
 
     <button type="submit">申請する</button>
     <input type="hidden" name="days" id="daysInput">
@@ -62,27 +72,36 @@
 const start = document.getElementById("start");
 const end = document.getElementById("end");
 const days = document.getElementById("days");
-const reason = document.getElementById("reason");
-const other = document.getElementById("otherReason");
 const daysInput = document.getElementById("daysInput");
 
-function calcDays() {
-  if (start.value && end.value) {
-    const s = new Date(start.value);
-    const e = new Date(end.value);
-    const diff = (e - s) / (1000 * 60 * 60 * 24) + 1;
-    const d = diff > 0 ? diff : 1;
-    days.textContent = d;
-    daysInput.value = d;   // ← ★この1行が重要
+let autoMode = true; // ← 自動計算フラグ
+
+start.addEventListener("change", () => {
+  if (!end.value) {
+    end.value = start.value;
+    autoMode = true;
   }
-}
-
-start.addEventListener("change", calcDays);
-end.addEventListener("change", calcDays);
-
-reason.addEventListener("change", () => {
-  other.style.display = reason.value === "other" ? "block" : "none";
+  calcDays();
 });
+
+end.addEventListener("change", () => {
+  // 日付②を触ったら自動解除
+  autoMode = false;
+  days.textContent = "";
+  daysInput.value = "";
+});
+
+function calcDays() {
+  if (!autoMode) return;
+
+  const s = new Date(start.value);
+  const e = new Date(end.value);
+  const diff = (e - s) / (1000 * 60 * 60 * 24) + 1;
+  const d = diff > 0 ? diff : 1;
+
+  days.textContent = d;
+  daysInput.value = d;
+}
 </script>
 </body>
 </html>
