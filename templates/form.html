@@ -35,8 +35,10 @@
     </div>
 
     <div class="days">
-      <span id="days">1</span> 日間
+     <input type="number" id="daysInput" name="days" value="1" min="1">
+     日間
     </div>
+
 
     <!-- 理由 -->
     <label>申請理由</label>
@@ -51,7 +53,9 @@
 
     <!-- その他入力 -->
     <textarea id="otherReason" name="other_reason"
-      placeholder="理由を入力してください"></textarea>
+      placeholder="理由を入力してください"
+      style="display:none;"></textarea>
+
     
     <label>種類</label>
     <select name="vacation_type">
@@ -64,7 +68,7 @@
     <textarea name="note" rows="3" placeholder="自由記入"></textarea>
 
     <button type="submit">申請する</button>
-    <input type="hidden" name="days" id="daysInput">
+
   </form>
 </div>
 
@@ -73,35 +77,35 @@ const start = document.getElementById("start");
 const end = document.getElementById("end");
 const days = document.getElementById("days");
 const daysInput = document.getElementById("daysInput");
+const daysBox = document.getElementById("daysBox");
+const reason = document.getElementById("reason");
+const other = document.getElementById("otherReason");
 
-let autoMode = true; // ← 自動計算フラグ
+reason.addEventListener("change", () => {
+  other.style.display = reason.value === "other" ? "block" : "none";
+});
 
+// 日付①変更時：毎回リセット
 start.addEventListener("change", () => {
-  if (!end.value) {
-    end.value = start.value;
-    autoMode = true;
-  }
-  calcDays();
+  end.value = start.value;     // 必ず同じ日付
+  daysInput.value = 1;         // 必ず1日
+  daysInput.readOnly = true;   // 編集不可
 });
 
+// 日付②変更時：手動入力を許可
 end.addEventListener("change", () => {
-  // 日付②を触ったら自動解除
-  autoMode = false;
-  days.textContent = "";
-  daysInput.value = "";
+  if (start.value && end.value) {
+    const s = new Date(start.value);
+    const e = new Date(end.value);
+    const diff = Math.floor((e - s) / (1000 * 60 * 60 * 24)) + 1;
+
+    if (diff > 0) {
+      daysInput.value = diff; // 初期値としてセット
+    }
+  }
+  daysInput.readOnly = false;  // ★ここが重要
 });
 
-function calcDays() {
-  if (!autoMode) return;
-
-  const s = new Date(start.value);
-  const e = new Date(end.value);
-  const diff = (e - s) / (1000 * 60 * 60 * 24) + 1;
-  const d = diff > 0 ? diff : 1;
-
-  days.textContent = d;
-  daysInput.value = d;
-}
 </script>
 </body>
 </html>
