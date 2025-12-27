@@ -20,10 +20,12 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # Render 上ではローカルで生成した token.json を使う
 def gmail_authenticate():
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    token_path = "/run/secrets/token.json"
+
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     else:
-        raise Exception("token.json が見つかりません。ローカルで初回認証してください。")
+        raise Exception("token.json が見つかりません。Render 上でアップロードしてください。")
     return build('gmail', 'v1', credentials=creds)
 
 def send_email(to, subject, body):
