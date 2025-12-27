@@ -25,7 +25,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # Render 上ではローカルで生成した token.json を使う
 def gmail_authenticate():
-    token_path = "/run/secrets/token.json"
+    token_path = "/etc/secrets/token.json"
 
     if os.path.exists(token_path):
         creds = Credentials.from_authorized_user_file(token_path, SCOPES)
@@ -95,7 +95,7 @@ def complete(
     approvers = ["mi.vida.loca.s2@gmail.com"]
 
     # Render 用のベース URL を設定（実際は環境変数で設定すると便利）
-    base_url = "https://your-render-app.onrender.com"
+    base_url = "https://render-test-s1fa.onrender.com"
 
     body = f"""
 {name} さんの休暇申請です。
