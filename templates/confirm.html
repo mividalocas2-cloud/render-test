@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>確認</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<div class="container">
+  <h1>申請内容確認</h1>
+
+  <dl>
+    <dt>所属</dt><dd>{{ department }}</dd>
+    <dt>氏名</dt><dd>{{ name }}</dd>
+    <dt>休暇期間</dt>
+    <dd>{{ start }} 〜 {{ end }}（{{ days }}日間）</dd>
+    <dt>理由</dt><dd>{{ reason }}</dd>
+  </dl>
+
+  <form action="/complete" method="post">
+    <button type="submit">この内容で申請</button>
+  </form>
+
+  <form action="/" method="get">
+    <button class="back">戻る</button>
+  </form>
+</div>
+</body>
+</html>

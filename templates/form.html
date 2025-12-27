@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>休暇申請</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<div class="container">
+  <h1>休暇申請</h1>
+
+  <form action="/confirm" method="post">
+
+    <!-- 所属 -->
+    <label>所属</label>
+    <select name="department" required>
+      <option value="">選択してください</option>
+      <option>野菜部</option>
+      <option>果実部</option>
+      <option>管理部</option>
+    </select>
+
+    <!-- 氏名 -->
+    <label>氏名</label>
+    <input type="text" name="name" required>
+
+    <!-- 休暇期間 -->
+    <label>休暇期間</label>
+    <div class="date-row">
+      <input type="date" id="start" required>
+      <span>〜</span>
+      <input type="date" id="end" required>
+    </div>
+
+    <div class="days">
+      <span id="days">1</span> 日間
+    </div>
+
+    <!-- 理由 -->
+    <label>申請理由</label>
+    <select id="reason" name="reason" required>
+      <option value="">選択してください</option>
+      <option>私用の為</option>
+      <option>体調不良の為</option>
+      <option>家族の看護の為</option>
+      <option>行事の為</option>
+      <option value="other">その他</option>
+    </select>
+
+    <!-- その他入力 -->
+    <textarea id="otherReason" name="other_reason"
+      placeholder="理由を入力してください"></textarea>
+
+    <button type="submit">申請する</button>
+    <input type="hidden" name="days" id="daysInput">
+  </form>
+</div>
+
+<script>
+const start = document.getElementById("start");
+const end = document.getElementById("end");
+const days = document.getElementById("days");
+const reason = document.getElementById("reason");
+const other = document.getElementById("otherReason");
+const daysInput = document.getElementById("daysInput");
+
+function calcDays() {
+  if (start.value && end.value) {
+    const s = new Date(start.value);
+    const e = new Date(end.value);
+    const diff = (e - s) / (1000 * 60 * 60 * 24) + 1;
+    const d = diff > 0 ? diff : 1;
+    days.textContent = d;
+    daysInput.value = d;   // ← ★この1行が重要
+  }
+}
+
+start.addEventListener("change", calcDays);
+end.addEventListener("change", calcDays);
+
+reason.addEventListener("change", () => {
+  other.style.display = reason.value === "other" ? "block" : "none";
+});
+</script>
+</body>
+</html>
