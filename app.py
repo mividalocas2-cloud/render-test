@@ -11,6 +11,11 @@ import base64
 
 app = FastAPI()
 
+@app.get("/")
+def root():
+    return RedirectResponse(url="/form")
+
+
 # static と templates
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")

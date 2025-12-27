@@ -22,10 +22,20 @@
   </dl>
 
   <form action="/complete" method="post">
+    <input type="hidden" name="department" value="{{ department }}">
+    <input type="hidden" name="name" value="{{ name }}">
+    <input type="hidden" name="start" value="{{ start }}">
+    <input type="hidden" name="end" value="{{ end }}">
+    <input type="hidden" name="days" value="{{ days }}">
+    <input type="hidden" name="reason" value="{{ reason }}">
+    <input type="hidden" name="other_reason" value="{{ other_reason }}">
+    <input type="hidden" name="vacation_type" value="{{ vacation_type }}">
+    <input type="hidden" name="note" value="{{ note }}">
     <button type="submit">この内容で申請</button>
   </form>
 
-  <form action="/" method="get">
+
+  <form action="/form" method="get">
     <button class="back">戻る</button>
   </form>
 </div>
