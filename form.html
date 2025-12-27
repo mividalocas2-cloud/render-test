@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>休暇申請</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<div class="container">
+  <h1>休暇申請</h1>
+
+  <form action="/confirm" method="post">
+
+    <!-- 所属 -->
+    <label>所属</label>
+    <select name="department" required>
+      <option value="">選択してください</option>
+      <option>野菜部</option>
+      <option>野菜部　加工課</option>
+      <option>果実部</option>
+      <option>果実部　輸入果実課</option>
+      <option>管理部　経理課</option>
+      <option>管理部　営業事務課</option>
+      <option>管理部　電算課</option>
+      <option>管理部　荷受課</option>
+      <option>パッケージセンター</option>
+      <option>吉田市場</option>
+    </select>
+
+    <!-- 氏名 -->
+    <label>氏名</label>
+    <input type="text" name="name" required>
+
+    <!-- 休暇期間 -->
+    <label>休暇期間</label>
+    <div class="date-row">
+      <input type="date" id="start" name="start" required>
+      <span>〜</span>
+      <input type="date" id="end" name="end" required>
+    </div>
+
+    <div class="days">
+     <input type="number" id="daysInput" name="days" value="1" min="1">
+     日間
+    </div>
+
+
+    <!-- 理由 -->
+    <label>申請理由</label>
+    <select id="reason" name="reason" required>
+      <option value="">選択してください</option>
+      <option>私用の為</option>
+      <option>体調不良の為</option>
+      <option>家族の看護の為</option>
+      <option>行事の為</option>
+      <option value="other">その他</option>
+    </select>
+
+    <!-- その他入力 -->
+    <textarea id="otherReason" name="other_reason"
+      placeholder="理由を入力してください"
+      style="display:none;"></textarea>
+
+    
+    <label>種類</label>
+    <select name="vacation_type">
+      <option value="有給休暇" selected>有給休暇</option>
+      <option value="特別休暇">特別休暇</option>
+      <option value="欠勤">欠勤</option>
+    </select>
+
+    <label>備考</label>
+    <textarea name="note" rows="3" placeholder="自由記入"
+      style="display:block; width:100%; min-height:40px;"></textarea>
+
+
+    <button type="submit">申請する</button>
+
+  </form>
+</div>
+
+<script>
+const start = document.getElementById("start");
+const end = document.getElementById("end");
+const days = document.getElementById("days");
+const daysInput = document.getElementById("daysInput");
+const daysBox = document.getElementById("daysBox");
+const reason = document.getElementById("reason");
+const other = document.getElementById("otherReason");
+
+reason.addEventListener("change", () => {
+  other.style.display = reason.value === "other" ? "block" : "none";
+});
+
+// 日付①変更時：毎回リセット
+start.addEventListener("change", () => {
+  end.value = start.value;     // 必ず同じ日付
+  daysInput.value = 1;         // 必ず1日
+  daysInput.readOnly = true;   // 編集不可
+});
+
+// 日付②変更時：手動入力を許可
+end.addEventListener("change", () => {
+  if (start.value && end.value) {
+    const s = new Date(start.value);
+    const e = new Date(end.value);
+    const diff = Math.floor((e - s) / (1000 * 60 * 60 * 24)) + 1;
+
+    if (diff > 0) {
+      daysInput.value = diff; // 初期値としてセット
+    }
+  }
+  daysInput.readOnly = false;  // ★ここが重要
+});
+
+</script>
+</body>
+</html>
