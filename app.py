@@ -21,7 +21,9 @@ def confirm(
     end: str = Form(...),
     days: str = Form(...),
     reason: str = Form(...),
-    other_reason: str = Form("")
+    other_reason: str = Form(""),
+    vacation_type: str = Form("有給休暇"),
+    note: str = Form("")
 ):
     return templates.TemplateResponse(
         "confirm.html",
@@ -33,6 +35,8 @@ def confirm(
             "end": end,
             "days": days,
             "reason": other_reason if reason == "other" else reason,
+            "vacation_type": vacation_type,
+            "note": note
         }
     )
 
