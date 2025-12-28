@@ -136,17 +136,36 @@ def complete(
 
 @app.get("/approve/{request_id}/{email}", response_class=HTMLResponse)
 def approve_page(request_id: int, email: str, request: Request):
-    row = get_db(request_id)
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT department, name, start_date, end_date, days,
+               reason, vacation_type, note
+        FROM leave_requests
+        WHERE id = %s
+    """, (request_id,))
+
+    row = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if row is None:
+        raise HTTPException(status_code=404, detail="申請が見つかりません")
+
     data = {
-        "name": row["name"],
-        "department": row["department"],
-        "start": row["start_date"],
-        "end": row["end_date"],
-        "days": row["days"],
-        "reason": row["reason"],
-        "vacation_type": row["vacation_type"],
-        "note": row["note"]
+        "department": row[0],
+        "name": row[1],
+        "start": row[2],
+        "end": row[3],
+        "days": row[4],
+        "reason": row[5],
+        "vacation_type": row[6],
+        "note": row[7]
     }
+
     return templates.TemplateResponse(
         "approve.html",
         {
@@ -156,6 +175,7 @@ def approve_page(request_id: int, email: str, request: Request):
             "data": data
         }
     )
+
 
 @app.post("/approve/{request_id}/{email}")
 def approve_submit(request_id: int, email: str):
