@@ -135,33 +135,26 @@ def complete(
         {"request": request}
     )
 
-@app.get("/approve/{request_id}/{email}", response_class=HTMLResponse)
-def approve_page(request_id: int, email: str, request: Request):
+def get_request_data(request_id: int):
     conn = get_db()
     cur = conn.cursor(cursor_factory=DictCursor)
 
-    # 申請データ
     cur.execute("""
-        SELECT *
+        SELECT department, name, start_date, end_date,
+               days, reason, vacation_type, note
         FROM leave_requests
         WHERE id = %s
     """, (request_id,))
+
     row = cur.fetchone()
-
-    # 承認状態（この人が承認済みか）
-    cur.execute("""
-        SELECT approved, approved_at
-        FROM approvals
-        WHERE request_id = %s
-          AND approver_email = %s
-    """, (request_id, email))
-    approval = cur.fetchone()
-
     cur.close()
     conn.close()
 
-    approved = approval["approved"]
-    approved_at = approval["approved_at"]
+    return dict(row)
+
+@app.get("/approve/{request_id}/{email}", response_class=HTMLResponse)
+def approve_page(request_id: int, email: str, request: Request):
+    data = get_request_data(request_id)
 
     return templates.TemplateResponse(
         "approve.html",
@@ -169,20 +162,39 @@ def approve_page(request_id: int, email: str, request: Request):
             "request": request,
             "request_id": request_id,
             "email": email,
-            "approved": approved,
-            "approved_at": approved_at,
-            "name": row["name"],
-            "department": row["department"],
-            "start": row["start_date"],
-            "end": row["end_date"],
-            "days": row["days"],
-            "reason": row["reason"],
-            "vacation_type": row["vacation_type"],
-            "note": row["note"]
+            "data": data
         }
     )
 
+@app.post("/approve/{request_id}/{email}", response_class=HTMLResponse)
+def approve_post(request_id: int, email: str, request: Request):
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=DictCursor)
 
+    cur.execute("""
+        UPDATE approvals
+        SET approved = true,
+            approved_at = NOW()
+        WHERE request_id = %s
+          AND approver_email = %s
+    """, (request_id, email))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    data = get_request_data(request_id)
+
+    return templates.TemplateResponse(
+        "approve.html",
+        {
+            "request": request,
+            "request_id": request_id,
+            "email": email,
+            "data": data,
+            "approved": True
+        }
+    )
 
 @app.post("/approve/{request_id}/{email}")
 def approve_submit(request_id: int, email: str):
