@@ -8,6 +8,12 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from email.mime.text import MIMEText
 import base64
+import psycopg2
+
+DATABASE_URL = os.environ["postgresql://approval_user:ukhT7c0k1hEk9PxvmgvDvhr76Atvd2sU@dpg-d5872tali9vc739svlh0-a.singapore-postgres.render.com/approval_db_bnlx"]
+
+def get_db():
+    return psycopg2.connect(DATABASE_URL, sslmode="require")
 
 app = FastAPI()
 
@@ -81,32 +87,43 @@ def confirm(
 @app.post("/complete", response_class=HTMLResponse)
 def complete(
     request: Request,
-    name: str = Form(...),
     department: str = Form(...),
+    name: str = Form(...),
     start: str = Form(...),
     end: str = Form(...),
-    days: str = Form(...),
+    days: int = Form(...),
     reason: str = Form(...),
     other_reason: str = Form(""),
     vacation_type: str = Form(...),
     note: str = Form("")
 ):
-    # 承認者リスト（テストユーザーのメール）
-    approvers = ["mi.vida.loca.s2@gmail.com"]
+    conn = get_db()
+    cur = conn.cursor()
 
-    # Render 用のベース URL を設定（実際は環境変数で設定すると便利）
-    base_url = "https://render-test-s1fa.onrender.com"
+    cur.execute("""
+        INSERT INTO leave_requests
+        (department, name, start_date, end_date, days, reason, other_reason, vacation_type, note)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        RETURNING id
+    """, (department, name, start, end, days, reason, other_reason, vacation_type, note))
 
-    body = f"""
-{name} さんの休暇申請です。
-所属: {department}
-休暇期間: {start} 〜 {end} ({days}日間)
-種類: {vacation_type}
-理由: {reason} {other_reason}
-備考: {note}
-承認リンク: {base_url}/approve
-"""
-    for a in approvers:
-        send_email(a, f"{name} さんの休暇申請", body)
+    request_id = cur.fetchone()[0]
 
-    return templates.TemplateResponse("complete.html", {"request": request})
+    approvers = [
+        "mi.vida.loca.s2@gmail.com",
+        "y-010.densan@af.wakwak.com"
+    ]
+    for mail in approvers:
+        cur.execute("""
+            INSERT INTO approvals (request_id, approver_email)
+            VALUES (%s, %s)
+        """, (request_id, mail))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return templates.TemplateResponse(
+        "complete.html",
+        {"request": request}
+    )
