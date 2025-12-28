@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 import base64
 import psycopg2
 
-DATABASE_URL = os.environ["postgresql://approval_user:ukhT7c0k1hEk9PxvmgvDvhr76Atvd2sU@dpg-d5872tali9vc739svlh0-a.singapore-postgres.render.com/approval_db_bnlx"]
+DATABASE_URL = os.environ["dpg-d5872tali9vc739svlh0-a.singapore-postgres.render.com/approval_db_bnlx"]
 
 def get_db():
     return psycopg2.connect(DATABASE_URL, sslmode="require")
