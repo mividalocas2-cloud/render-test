@@ -136,12 +136,24 @@ def complete(
 
 @app.get("/approve/{request_id}/{email}", response_class=HTMLResponse)
 def approve_page(request_id: int, email: str, request: Request):
+    row = get_db(request_id)
+    data = {
+        "name": row["name"],
+        "department": row["department"],
+        "start": row["start_date"],
+        "end": row["end_date"],
+        "days": row["days"],
+        "reason": row["reason"],
+        "vacation_type": row["vacation_type"],
+        "note": row["note"]
+    }
     return templates.TemplateResponse(
         "approve.html",
         {
             "request": request,
             "request_id": request_id,
-            "email": email
+            "email": email,
+            "data": data
         }
     )
 

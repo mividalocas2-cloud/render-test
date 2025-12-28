@@ -8,20 +8,18 @@
 
 <h2>休暇申請 承認</h2>
 
-<p>氏名：{{ data[1] }}</p>
-<p>期間：{{ data[2] }} ～ {{ data[3] }}（{{ data[4] }}日）</p>
-<p>理由：{{ data[5] }} {{ data[6] }}</p>
+<p>氏名：{{ data.name }}</p>
+<p>所属：{{ data.department }}</p>
+<p>期間：{{ data.start }} ～ {{ data.end }}（{{ data.days }}日）</p>
+<p>理由：{{ data.reason }}</p>
+<p>種類：{{ data.vacation_type }}</p>
+<p>備考：{{ data.note }}</p>
 
-{% if data[9] %}
-  <p>✅ 承認済み</p>
-  <p>承認日時：{{ data[10] }}</p>
-{% else %}
 <form method="post">
   <button type="submit" class="approve-btn">
     承認する
   </button>
 </form>
-{% endif %}
 
 </body>
 </html>
