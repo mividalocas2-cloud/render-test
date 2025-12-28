@@ -16,11 +16,10 @@
   <p>✅ 承認済み</p>
   <p>承認日時：{{ data[10] }}</p>
 {% else %}
-<form action="/approve" method="post" enctype="multipart/form-data">
-  <input type="hidden" name="request_id" value="{{ request_id }}">
-  <input type="hidden" name="email" value="{{ email }}">
-  <input type="file" name="stamp" required>
-  <button type="submit">承認する</button>
+<form method="post">
+  <button type="submit" class="approve-btn">
+    承認する
+  </button>
 </form>
 {% endif %}
 
