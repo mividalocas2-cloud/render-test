@@ -9,32 +9,34 @@
 
 <body>
 <div class="container">
-
   <h1>休暇申請 承認</h1>
 
-  <p><strong>氏名：</strong>{{ data.name }}</p>
-  <p><strong>部署：</strong>{{ data.department }}</p>
+  <p>氏名：{{ data.name }}</p>
+  <p>期間：{{ data.start }} ～ {{ data.end }}（{{ data.days }}日）</p>
 
-  <p>
-    <strong>期間：</strong>
-    {{ data.start_date }} ～ {{ data.end_date }}（{{ data.days }}日）
-  </p>
+  <!-- ▼ 承認スタンプ表示エリア -->
+  <div class="stamp-area">
+    {% for a in approvals %}
+      {% if a.approved %}
+        <div class="stamp-box">
+          <img src="/static/stamps/{{ a.stamp }}" class="stamp">
+          <div class="stamp-info">
+            {{ a.email }}<br>
+            {{ a.approved_at }}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
 
-  <p>
-    <strong>理由：</strong>
-    {{ data.reason }} {{ data.vacation_type }}
-  </p>
-
-  {% if approved %}
-    <p class="approved">✅ 承認済み</p>
-  {% else %}
-    <form method="post">
-      <button type="submit" class="btn-primary">
-        承認する
-      </button>
-    </form>
-  {% endif %}
-
+  <!-- ▼ 未承認ならボタン表示 -->
+  {% for a in approvals %}
+    {% if a.email == request.query_params.email and not a.approved %}
+      <form method="post">
+        <button type="submit" class="btn-primary">
+          承認する
+        </button>
+      </form>
+    {% endif %}
+  {% endfor %}
 </div>
-</body>
-</html>

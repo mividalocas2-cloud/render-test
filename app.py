@@ -156,32 +156,82 @@ def get_request_data(request_id: int):
     conn = get_db()
     cur = conn.cursor(cursor_factory=DictCursor)
 
+    # ① 申請本体
     cur.execute("""
-        SELECT department, name, start_date, end_date,
-               days, reason, vacation_type, note
+        SELECT
+            department,
+            name,
+            start_date,
+            end_date,
+            days,
+            reason,
+            vacation_type,
+            note
         FROM leave_requests
         WHERE id = %s
     """, (request_id,))
 
-    row = cur.fetchone()
+    req = cur.fetchone()
+    if not req:
+        cur.close()
+        conn.close()
+        return None
+
+    # ② 承認一覧
+    cur.execute("""
+        SELECT
+            approver_email,
+            approved,
+            approved_at
+        FROM approvals
+        WHERE request_id = %s
+        ORDER BY id
+    """, (request_id,))
+
+    approvals = []
+    for row in cur.fetchall():
+        approvals.append({
+            "email": row["approver_email"],
+            "approved": row["approved"],
+            "approved_at": row["approved_at"]
+        })
+
     cur.close()
     conn.close()
 
-    return dict(row)
+    # ③ まとめて返す
+    return {
+        "name": req["name"],
+        "department": req["department"],
+        "start": req["start_date"],
+        "end": req["end_date"],
+        "days": req["days"],
+        "reason": req["reason"],
+        "vacation_type": req["vacation_type"],
+        "note": req["note"],
+        "approvals": approvals
+    }
+
 
 @app.get("/approve/{request_id}/{email}", response_class=HTMLResponse)
 def approve_page(request_id: int, email: str, request: Request):
     data = get_request_data(request_id)
-    approved = get_approval_status(request_id, email)
+
+    approval_views = []
+    for a in data["approvals"]:
+        approval_views.append({
+            "email": a["email"],
+            "approved": a["approved"],
+            "approved_at": a["approved_at"],
+            "stamp": APPROVER_STAMPS.get(a["email"])  # ← ここ
+        })
 
     return templates.TemplateResponse(
         "approve.html",
         {
             "request": request,
-            "request_id": request_id,
-            "email": email,
             "data": data,
-            "approved": approved
+            "approvals": approval_views
         }
     )
 
