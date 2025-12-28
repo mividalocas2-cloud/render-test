@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>承認</title>
+</head>
+<body>
+
+<h2>休暇申請 承認</h2>
+
+<p>氏名：{{ data[1] }}</p>
+<p>期間：{{ data[2] }} ～ {{ data[3] }}（{{ data[4] }}日）</p>
+<p>理由：{{ data[5] }} {{ data[6] }}</p>
+
+{% if data[9] %}
+  <p>✅ 承認済み</p>
+  <p>承認日時：{{ data[10] }}</p>
+{% else %}
+<form action="/approve" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="request_id" value="{{ request_id }}">
+  <input type="hidden" name="email" value="{{ email }}">
+  <input type="file" name="stamp" required>
+  <button type="submit">承認する</button>
+</form>
+{% endif %}
+
+</body>
+</html>

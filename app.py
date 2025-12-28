@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-
+from datetime import datetime
 import os
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -127,3 +127,61 @@ def complete(
         "complete.html",
         {"request": request}
     )
+
+@app.get("/approve/{request_id}/{email}", response_class=HTMLResponse)
+def approve_page(request: Request, request_id: int, email: str):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT lr.department, lr.name, lr.start_date, lr.end_date,
+               lr.days, lr.reason, lr.other_reason, lr.vacation_type, lr.note,
+               a.approved, a.approved_at, a.stamp_image
+        FROM leave_requests lr
+        JOIN approvals a ON lr.id = a.request_id
+        WHERE lr.id = %s AND a.approver_email = %s
+    """, (request_id, email))
+
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not row:
+        return HTMLResponse("承認対象が見つかりません", status_code=404)
+
+    return templates.TemplateResponse(
+        "approve.html",
+        {
+            "request": request,
+            "data": row,
+            "request_id": request_id,
+            "email": email
+        }
+    )
+
+@app.post("/approve")
+def approve(
+    request_id: int = Form(...),
+    email: str = Form(...),
+    stamp: UploadFile = File(...)
+):
+    stamp_path = f"static/stamps/{request_id}_{email}.png"
+    with open(stamp_path, "wb") as f:
+        f.write(stamp.file.read())
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE approvals
+        SET approved = TRUE,
+            approved_at = %s,
+            stamp_image = %s
+        WHERE request_id = %s AND approver_email = %s
+    """, (datetime.now(), stamp_path, request_id, email))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"status": "approved"}
