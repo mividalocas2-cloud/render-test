@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from psycopg2.extras import DictCursor
 from datetime import datetime
 import os
 from google.oauth2.credentials import Credentials
@@ -136,35 +137,31 @@ def complete(
 
 @app.get("/approve/{request_id}/{email}", response_class=HTMLResponse)
 def approve_page(request_id: int, email: str, request: Request):
-
     conn = get_db()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=DictCursor)
 
+    # 申請データ
     cur.execute("""
-        SELECT department, name, start_date, end_date, days,
-               reason, vacation_type, note
+        SELECT *
         FROM leave_requests
         WHERE id = %s
     """, (request_id,))
-
     row = cur.fetchone()
+
+    # 承認状態（この人が承認済みか）
+    cur.execute("""
+        SELECT approved, approved_at
+        FROM approvals
+        WHERE request_id = %s
+          AND approver_email = %s
+    """, (request_id, email))
+    approval = cur.fetchone()
 
     cur.close()
     conn.close()
 
-    if row is None:
-        raise HTTPException(status_code=404, detail="申請が見つかりません")
-
-    data = {
-        "department": row[0],
-        "name": row[1],
-        "start": row[2],
-        "end": row[3],
-        "days": row[4],
-        "reason": row[5],
-        "vacation_type": row[6],
-        "note": row[7]
-    }
+    approved = approval["approved"]
+    approved_at = approval["approved_at"]
 
     return templates.TemplateResponse(
         "approve.html",
@@ -172,9 +169,19 @@ def approve_page(request_id: int, email: str, request: Request):
             "request": request,
             "request_id": request_id,
             "email": email,
-            "data": data
+            "approved": approved,
+            "approved_at": approved_at,
+            "name": row["name"],
+            "department": row["department"],
+            "start": row["start_date"],
+            "end": row["end_date"],
+            "days": row["days"],
+            "reason": row["reason"],
+            "vacation_type": row["vacation_type"],
+            "note": row["note"]
         }
     )
+
 
 
 @app.post("/approve/{request_id}/{email}")
@@ -201,4 +208,7 @@ def approve_submit(request_id: int, email: str):
     cur.close()
     conn.close()
 
-    return {"status": "approved"}
+    return RedirectResponse(
+    url=f"/approve/{request_id}/{email}",
+    status_code=303
+)

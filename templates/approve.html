@@ -15,11 +15,14 @@
 <p>種類：{{ data.vacation_type }}</p>
 <p>備考：{{ data.note }}</p>
 
-<form method="post">
-  <button type="submit" class="approve-btn">
-    承認する
-  </button>
-</form>
+{% if approved %}
+  <p>✅ 承認済み</p>
+{% else %}
+  <form method="post">
+    <button type="submit">承認する</button>
+  </form>
+{% endif %}
+
 
 </body>
 </html>
