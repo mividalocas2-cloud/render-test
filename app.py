@@ -135,6 +135,23 @@ def complete(
         {"request": request}
     )
 
+def get_approval_status(request_id: int, email: str) -> bool:
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=DictCursor)
+
+    cur.execute("""
+        SELECT approved
+        FROM approvals
+        WHERE request_id = %s
+          AND approver_email = %s
+    """, (request_id, email))
+
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    return row and row["approved"]
+
 def get_request_data(request_id: int):
     conn = get_db()
     cur = conn.cursor(cursor_factory=DictCursor)
@@ -155,6 +172,7 @@ def get_request_data(request_id: int):
 @app.get("/approve/{request_id}/{email}", response_class=HTMLResponse)
 def approve_page(request_id: int, email: str, request: Request):
     data = get_request_data(request_id)
+    approved = get_approval_status(request_id, email)
 
     return templates.TemplateResponse(
         "approve.html",
@@ -162,14 +180,16 @@ def approve_page(request_id: int, email: str, request: Request):
             "request": request,
             "request_id": request_id,
             "email": email,
-            "data": data
+            "data": data,
+            "approved": approved
         }
     )
+
 
 @app.post("/approve/{request_id}/{email}", response_class=HTMLResponse)
 def approve_post(request_id: int, email: str, request: Request):
     conn = get_db()
-    cur = conn.cursor(cursor_factory=DictCursor)
+    cur = conn.cursor()
 
     cur.execute("""
         UPDATE approvals
@@ -184,6 +204,7 @@ def approve_post(request_id: int, email: str, request: Request):
     conn.close()
 
     data = get_request_data(request_id)
+    approved = True  # 今承認した直後なので確定
 
     return templates.TemplateResponse(
         "approve.html",
@@ -192,7 +213,7 @@ def approve_post(request_id: int, email: str, request: Request):
             "request_id": request_id,
             "email": email,
             "data": data,
-            "approved": True
+            "approved": approved
         }
     )
 
