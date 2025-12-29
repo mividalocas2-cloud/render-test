@@ -17,38 +17,27 @@
   <!-- ▼ 承認スタンプ表示エリア -->
 <h3>承認</h3>
 
-<div class="stamp-area">
+<div class="approvals">
   {% for a in approvals %}
-    <div class="stamp-box">
-      <div class="approver-name">
-        {{ a.name }}
-      </div>
+    <div class="approval-box">
+
+      <div class="approver-name">{{ a.name }}</div>
 
       {% if a.approved %}
-        <img
-          src="/static/stamps/{{ a.stamp }}"
-          class="stamp-img"
-          alt="承認印">
-        <div class="approved-at">
-          {{ a.approved_at }}
-        </div>
+        <img src="/static/stamps/{{ a.stamp }}" class="stamp">
+        <div class="approved-at">{{ a.approved_at }}</div>
       {% else %}
-        <div class="stamp-placeholder">
-          未承認
-        </div>
-      {% endif %}
-    </div>
-  {% endfor %}
-</div>
+        <div class="not-approved">未承認</div>
 
-  <!-- ▼ 未承認ならボタン表示 -->
-  {% for a in approvals %}
-    {% if a.email == request.query_params.email and not a.approved %}
-      <form method="post">
-        <button type="submit" class="btn-primary">
-          承認する
-        </button>
-      </form>
-    {% endif %}
+        {% if a.email == email %}
+          <form method="post">
+            <button type="submit" class="approve-btn">
+              承認する
+            </button>
+          </form>
+        {% endif %}
+      {% endif %}
+
+    </div>
   {% endfor %}
 </div>

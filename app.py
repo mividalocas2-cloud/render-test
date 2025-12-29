@@ -233,10 +233,10 @@ def approve_page(request_id: int, email: str, request: Request):
         {
             "request": request,
             "data": data,
-            "approvals": data["approvals"]
+            "approvals": data["approvals"],
+            "email": email
         }
     )
-
 
 @app.post("/approve/{request_id}/{email}", response_class=HTMLResponse)
 def approve_post(request_id: int, email: str, request: Request):
@@ -247,8 +247,8 @@ def approve_post(request_id: int, email: str, request: Request):
         UPDATE approvals
         SET approved = true,
             approved_at = NOW()
-        WHERE request_id = %s
-          AND approver_email = %s
+        WHERE request_id = :request_id
+        AND approver_email = :email
     """, (request_id, email))
 
     conn.commit()
