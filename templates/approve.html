@@ -13,21 +13,24 @@
 
   <p>氏名：{{ data.name }}</p>
   <p>期間：{{ data.start }} ～ {{ data.end }}（{{ data.days }}日）</p>
+  <p>理由：{{ data.reason }}</p>
+  <p>種類：{{ data.vacation_type }}</p>
 
   <!-- ▼ 承認スタンプ表示エリア -->
-<h3>承認</h3>
+<h3>承認状況</h3>
 
 <div class="approvals">
-  {% for a in approvals %}
-    <div class="approval-box">
-
+  {% for a in data.approvals %}
+    <div class="approval-card">
       <div class="approver-name">{{ a.name }}</div>
 
-      {% if a.approved %}
-        <img src="/static/stamps/{{ a.stamp }}" class="stamp">
-        <div class="approved-at">{{ a.approved_at }}</div>
-      {% else %}
-        <div class="not-approved">未承認</div>
+      <div class="stamp-box">
+        {% if a.approved %}
+          <img src="/static/stamps/{{ a.stamp }}" class="stamp-img">
+        {% else %}
+          <div class="not-approved">未承認</div>
+        {% endif %}
+      </div>
 
         {% if a.email == email %}
           <form method="post">
