@@ -15,19 +15,31 @@
   <p>期間：{{ data.start }} ～ {{ data.end }}（{{ data.days }}日）</p>
 
   <!-- ▼ 承認スタンプ表示エリア -->
-  <div class="stamp-area">
-    {% for a in approvals %}
+<h3>承認</h3>
+
+<div class="stamp-area">
+  {% for a in approvals %}
+    <div class="stamp-box">
+      <div class="approver-name">
+        {{ a.name }}
+      </div>
+
       {% if a.approved %}
-        <div class="stamp-box">
-          <img src="/static/stamps/{{ a.stamp }}" class="stamp">
-          <div class="stamp-info">
-            {{ a.email }}<br>
-            {{ a.approved_at }}
-          </div>
+        <img
+          src="/static/stamps/{{ a.stamp }}"
+          class="stamp-img"
+          alt="承認印">
+        <div class="approved-at">
+          {{ a.approved_at }}
+        </div>
+      {% else %}
+        <div class="stamp-placeholder">
+          未承認
         </div>
       {% endif %}
-    {% endfor %}
-  </div>
+    </div>
+  {% endfor %}
+</div>
 
   <!-- ▼ 未承認ならボタン表示 -->
   {% for a in approvals %}

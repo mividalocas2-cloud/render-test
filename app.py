@@ -18,9 +18,9 @@ APPROVERS = {
         "y-010.densan@af.wakwak.com"
     }
 
-APPROVER_STAMPS = {
-        "mi.vida.loca.s2@gmail.com": "goto.png",
-        "y-010.densan@af.wakwak.com": "endo.png"
+APPROVER_INFO = {
+        "mi.vida.loca.s2@gmail.com": {"name" : "後藤" , "stamp" : "goto.png"},
+        "y-010.densan@af.wakwak.com": {"name" : "遠藤" , "stamp" : "endo.png"}
     }
 
 def get_db():
@@ -191,7 +191,9 @@ def get_request_data(request_id: int):
     approvals = []
     for row in cur.fetchall():
         approvals.append({
-            "email": row["approver_email"],
+            "email": row["approver_email"],            # 内部用
+            "name": APPROVER_INFO[row["approver_email"]]["name"],
+            "stamp": APPROVER_INFO[row["approver_email"]]["stamp"],
             "approved": row["approved"],
             "approved_at": row["approved_at"]
         })
@@ -223,7 +225,7 @@ def approve_page(request_id: int, email: str, request: Request):
             "email": a["email"],
             "approved": a["approved"],
             "approved_at": a["approved_at"],
-            "stamp": APPROVER_STAMPS.get(a["email"])  # ← ここ
+            "stamp": APPROVER_INFO.get(a["email"])  # ← ここ
         })
 
     return templates.TemplateResponse(
@@ -231,7 +233,7 @@ def approve_page(request_id: int, email: str, request: Request):
         {
             "request": request,
             "data": data,
-            "approvals": approval_views
+            "approvals": data["approvals"]
         }
     )
 
@@ -269,7 +271,7 @@ def approve_post(request_id: int, email: str, request: Request):
 
 @app.post("/approve/{request_id}/{email}")
 def approve_submit(request_id: int, email: str):
-    stamp = APPROVER_STAMPS.get(email)
+    stamp = APPROVER_INFO.get(email)
 
     if not stamp:
         raise HTTPException(status_code=403, detail="承認権限がありません")
