@@ -241,10 +241,11 @@ def approve_page(request_id: int, email: str, request: Request):
 
 @app.post("/approve/{request_id}/{email}")
 def approve_submit(request_id: int, email: str):
-    stamp = APPROVER_INFO.get(email)
-
-    if not stamp:
+    info = APPROVER_INFO.get(email)
+    if not info:
         raise HTTPException(status_code=403, detail="承認権限がありません")
+
+    stamp = info["stamp"]   # ← dict ではなく文字列
 
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
