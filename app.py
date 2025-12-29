@@ -238,36 +238,6 @@ def approve_page(request_id: int, email: str, request: Request):
         }
     )
 
-@app.post("/approve/{request_id}/{email}", response_class=HTMLResponse)
-def approve_post(request_id: int, email: str, request: Request):
-    conn = get_db()
-    cur = conn.cursor()
-
-    cur.execute("""
-        UPDATE approvals
-        SET approved = true,
-            approved_at = NOW()
-        WHERE request_id = :request_id
-        AND approver_email = :email
-    """, (request_id, email))
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    data = get_request_data(request_id)
-    approved = True  # 今承認した直後なので確定
-
-    return templates.TemplateResponse(
-        "approve.html",
-        {
-            "request": request,
-            "request_id": request_id,
-            "email": email,
-            "data": data,
-            "approved": approved
-        }
-    )
 
 @app.post("/approve/{request_id}/{email}")
 def approve_submit(request_id: int, email: str):

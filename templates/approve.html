@@ -32,14 +32,30 @@
         {% endif %}
       </div>
 
-        {% if a.email == email %}
+      <!-- 印鑑の下エリア -->
+      <div class="approval-action">
+
+        {% if a.approved %}
+          <!-- 承認済み → 承認日時 -->
+          <div class="approved-at">
+            {{ a.approved_at }}
+          </div>
+
+        {% elif a.email == email %}
+          <!-- 未承認 ＆ 本人 → 承認ボタン -->
           <form method="post">
             <button type="submit" class="approve-btn">
               承認する
             </button>
           </form>
+
+        {% else %}
+          <!-- 未承認 ＆ 他人 → 空 -->
+          <div class="approved-at empty"></div>
         {% endif %}
 
+      </div>
     </div>
   {% endfor %}
 </div>
+

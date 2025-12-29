@@ -75,11 +75,12 @@ dl dd {
 
 /* 1人分の承認枠 */
 .stamp-box {
-  width: 140px;
-  border: 2px solid #000;
-  padding: 8px;
-  text-align: center;
-  background: #fff;
+  height: 90px;
+  border: 1px dashed #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
 }
 
 .approvals {
@@ -98,7 +99,7 @@ dl dd {
 
 /* 承認者名 */
 .approver-name {
-  font-size: 12px;
+  font-size: 16px;
   margin-bottom: 6px;
   border-bottom: 1px solid #000;
   padding-bottom: 4px;
@@ -106,8 +107,8 @@ dl dd {
 
 /* 印鑑画像 */
 .stamp-img {
-  width: 60px;        /* ← 小さくする */
-  height: 60px;
+  width: 70px;        /* ← 小さくする */
+  height: 70px;
   object-fit: contain;
   margin: 8px auto;
 }
@@ -126,7 +127,23 @@ dl dd {
 }
 
 /* 承認日時 */
+.approval-action {
+  min-height: 36px;   /* ← ボタンと日時の高さを揃える */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .approved-at {
-  font-size: 10px;
-  margin-top: 6px;
+  font-size: 11px;
+  color: #555;
+}
+
+.approved-at.empty {
+  visibility: hidden; /* 枠のズレ防止 */
+}
+
+.approve-btn {
+  padding: 4px 10px;
+  font-size: 12px;
 }
