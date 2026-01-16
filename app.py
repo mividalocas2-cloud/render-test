@@ -54,8 +54,7 @@ def get_db():
 # LINE WORKS
 # ==============================
 def get_lineworks_access_token() -> str:
-    private_key_info = json.loads(LINEWORKS_PRIVATE_KEY)
-    private_key = private_key_info["private_key"]
+    private_key = LINEWORKS_PRIVATE_KEY.replace("\\n", "\n")
 
     now = int(time.time())
 
