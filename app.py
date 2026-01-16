@@ -164,6 +164,8 @@ def complete(
     vacation_type: str = Form(...),
     note: str = Form("")
 ):
+    print("=== COMPLETE 開始 ===")
+
     conn = get_db()
     cur = conn.cursor()
 
@@ -175,6 +177,7 @@ def complete(
     """, (department, name, start, end, days, reason, other_reason, vacation_type, note))
 
     request_id = cur.fetchone()[0]
+    print("request_id:", request_id)
 
     for mail in APPROVERS:
         cur.execute("""
@@ -186,10 +189,16 @@ def complete(
     cur.close()
     conn.close()
 
+    print("=== DB登録 完了 ===")
+
+    # 🔽 ここで通知（まずはログだけ）
+    print("=== LINE WORKS 通知予定 ===")
+
     return templates.TemplateResponse(
         "complete.html",
         {"request": request}
     )
+
 
 def get_approval_status(request_id: int, email: str) -> bool:
     conn = get_db()
