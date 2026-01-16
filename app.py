@@ -40,6 +40,62 @@ templates = Jinja2Templates(directory="templates")
 # Gmail API スコープ
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
+def get_lineworks_access_token():
+    import os, json, time, jwt, requests
+
+    SERVICE_ACCOUNT = os.environ["LINEWORKS_SERVICE_ACCOUNT"]
+    PRIVATE_KEY_JSON = os.environ["LINEWORKS_PRIVATE_KEY"]
+
+    private_key_info = json.loads(PRIVATE_KEY_JSON)
+    PRIVATE_KEY = private_key_info["private_key"]
+
+    now = int(time.time())
+
+    payload = {
+        "iss": SERVICE_ACCOUNT,
+        "sub": SERVICE_ACCOUNT,
+        "iat": now,
+        "exp": now + 3600,
+        "aud": "https://auth.worksmobile.com"
+    }
+
+    jwt_token = jwt.encode(payload, PRIVATE_KEY, algorithm="RS256")
+
+    token_url = "https://auth.worksmobile.com/oauth2/v2.0/token"
+
+    res = requests.post(token_url, data={
+        "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        "assertion": jwt_token,
+        "scope": "bot"
+    })
+
+    res.raise_for_status()
+    return res.json()["access_token"]
+
+def send_lineworks_message(user_id: str, text: str):
+    import requests, os
+
+    access_token = get_lineworks_access_token()
+    bot_id = os.environ["LINEWORKS_BOT_ID"]
+
+    url = f"https://www.worksapis.com/v1.0/bots/{bot_id}/users/{user_id}/messages"
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "content": {
+            "type": "text",
+            "text": text
+        }
+    }
+
+    res = requests.post(url, headers=headers, json=payload)
+    res.raise_for_status()
+
+
 # Render 上ではローカルで生成した token.json を使う
 def gmail_authenticate():
     token_path = "/etc/secrets/token.json"
