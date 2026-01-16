@@ -194,7 +194,7 @@ def complete(
     # 🔽 ここで通知（まずはログだけ）
     print("=== LINE WORKS 通知予定 ===")
 
-    from lineworks import send_lineworks_message
+    #from lineworks import send_lineworks_message
 
     print("=== LINE WORKS 通知開始 ===")
 
