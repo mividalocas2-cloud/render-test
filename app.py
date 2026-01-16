@@ -194,6 +194,25 @@ def complete(
     # 🔽 ここで通知（まずはログだけ）
     print("=== LINE WORKS 通知予定 ===")
 
+    from lineworks import send_lineworks_message
+
+    print("=== LINE WORKS 通知開始 ===")
+
+    send_lineworks_message(
+        user_id="toshiya.goto@works-826009",
+        text=f"""
+    【休暇申請】
+    申請者：{name}
+    期間：{start} ～ {end}（{days}日）
+
+    承認はこちら
+    https://あなたのURL/approve/{request_id}/承認者メール
+    """
+    )
+
+    print("=== LINE WORKS 通知完了 ===")
+
+
     return templates.TemplateResponse(
         "complete.html",
         {"request": request}
