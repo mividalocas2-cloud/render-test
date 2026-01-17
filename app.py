@@ -26,7 +26,7 @@ def root():
             "aud": TOKEN_URL,
             "iat": now,
             "exp": now + 3600,
-            "scope": "bot" # 利用するスコープに合わせて適宜変更
+            "scope": "bot.message" # 利用するスコープに合わせて適宜変更
         }
 
         # RS256で署名
