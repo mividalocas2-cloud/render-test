@@ -72,10 +72,14 @@ def get_lineworks_access_token() -> str:
         "https://auth.worksmobile.com/oauth2/v2.0/token",
         data={
             "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            "client_id": LINEWORKS_SERVICE_ACCOUNT,  # ★これが必須
             "assertion": jwt_token,
             "scope": "bot.message",
         },
     )
+
+    print("status:", res.status_code)
+    print("body:", res.text)
 
     # デバッグ用（一度だけ入れてOK）
     print("ここに結果が出る")
