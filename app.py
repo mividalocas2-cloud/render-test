@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from lineworks_auth import load_service_account
+from lineworks_auth import get_access_token
 
 app = FastAPI()
 
@@ -7,9 +7,6 @@ app = FastAPI()
 def root():
     return {"ok": True}
 
-@app.get("/debug/service-account")
-def debug_service_account():
-    data = load_service_account()
-    return {
-        "keys": list(data.keys())
-    }
+@app.get("/token")
+def token():
+    return get_access_token()
