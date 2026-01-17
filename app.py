@@ -34,9 +34,9 @@ def get_access_token():
     }
 
     res = requests.post(TOKEN_URL, data=data)
-    res.raise_for_status()
-
-    return res.json()["access_token"]
+    print(res.status_code)
+    print(res.text)
+    return res.text
 
 
 @app.get("/token-test")
