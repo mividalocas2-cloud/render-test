@@ -25,6 +25,7 @@ from fastapi.templating import Jinja2Templates
 # ==============================
 DATABASE_URL = os.environ["DATABASE_URL"]
 LINEWORKS_SERVICE_ACCOUNT = os.environ["LINEWORKS_SERVICE_ACCOUNT"]
+LINEWORKS_CLIENT_ID = os.environ["LINEWORKS_CLIENT_ID"]
 LINEWORKS_PRIVATE_KEY = os.environ["LINEWORKS_PRIVATE_KEY"]
 LINEWORKS_BOT_ID = os.environ["LINEWORKS_BOT_ID"]
 
@@ -72,7 +73,7 @@ def get_lineworks_access_token() -> str:
         "https://auth.worksmobile.com/oauth2/v2.0/token",
         data={
             "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-            "client_id": LINEWORKS_SERVICE_ACCOUNT,  # ★これが必須
+            "client_id": LINEWORKS_CLIENT_ID,  # ★これが必須
             "assertion": jwt_token,
             "scope": "bot.message",
         },
