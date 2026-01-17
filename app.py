@@ -19,7 +19,7 @@ def root():
         now = int(time.time())
 
         payload = {
-            "iss": service_account_id,
+            "iss": client_id,
             "sub": service_account_id,
             "aud": TOKEN_URL,
             "iat": now,
