@@ -5,44 +5,35 @@ import requests
 
 TOKEN_URL = "https://auth.worksmobile.com/oauth2/v2.0/token"
 
-def create_jwt():
-    private_key = os.environ["LINEWORKS_PRIVATE_KEY"].replace("\\n", "\n")
+client_id = os.environ["LINEWORKS_CLIENT_ID"]
+client_secret = os.environ["LINEWORKS_CLIENT_SECRET"]
+service_account_id = os.environ["LINEWORKS_SERVICE_ACCOUNT_ID"]
+private_key = os.environ["LINEWORKS_PRIVATE_KEY"].replace("\\n", "\n")
 
-    service_account_id = os.environ["LINEWORKS_SERVICE_ACCOUNT_ID"]
-    client_id = os.environ["LINEWORKS_CLIENT_ID"]
+now = int(time.time())
 
-    now = int(time.time())
+payload = {
+    "iss": service_account_id,
+    "sub": service_account_id,
+    "aud": TOKEN_URL,
+    "iat": now,
+    "exp": now + 3600,
+    "scope": "bot"
+}
 
-    payload = {
-        "iss": service_account_id,   # ← ここ！
-        "sub": service_account_id,   # ← ここ！
-        "aud": TOKEN_URL,
-        "iat": now,
-        "exp": now + 3600,
-    }
+jwt_assertion = jwt.encode(
+    payload,
+    private_key,
+    algorithm="RS256"
+)
 
-    token = jwt.encode(
-        payload,
-        private_key,
-        algorithm="RS256"
-    )
+data = {
+    "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+    "assertion": jwt_assertion,
+    "client_id": client_id,
+    "client_secret": client_secret,
+}
 
-    return token
-
-
-def get_access_token():
-    assertion = create_jwt()
-
-    data = {
-        "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-        "assertion": assertion,
-        "client_id": os.environ["LINEWORKS_CLIENT_ID"],        # ← client app
-        "client_secret": os.environ["LINEWORKS_CLIENT_SECRET"],
-        "scope": "bot"
-    }
-
-    res = requests.post(TOKEN_URL, data=data)
-    if res.status_code != 200:
-        raise Exception(res.text)
-
-    return res.json()
+res = requests.post(TOKEN_URL, data=data)
+print(res.status_code)
+print(res.text)
