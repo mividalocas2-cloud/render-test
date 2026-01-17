@@ -78,8 +78,10 @@ def get_lineworks_access_token() -> str:
     )
 
     # デバッグ用（一度だけ入れてOK）
+    print("ここに結果が出る")
     print(res.status_code)
     print(res.text)
+    print("結果出力終了")
 
     res.raise_for_status()
     return res.json()["access_token"]
