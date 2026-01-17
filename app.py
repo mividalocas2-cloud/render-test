@@ -61,9 +61,9 @@ def get_lineworks_access_token() -> str:
     payload = {
         "iss": LINEWORKS_SERVICE_ACCOUNT,
         "sub": LINEWORKS_SERVICE_ACCOUNT,
+        "aud": "https://auth.worksmobile.com/oauth2/v2.0/token",
         "iat": now,
         "exp": now + 3600,
-        "aud": "https://auth.worksmobile.com"
     }
 
     jwt_token = jwt.encode(payload, private_key, algorithm="RS256")
@@ -73,12 +73,17 @@ def get_lineworks_access_token() -> str:
         data={
             "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
             "assertion": jwt_token,
-            "scope": "bot"
-        }
+            "scope": "bot.message",
+        },
     )
+
+    # デバッグ用（一度だけ入れてOK）
+    print(res.status_code)
+    print(res.text)
 
     res.raise_for_status()
     return res.json()["access_token"]
+
 
 
 def send_lineworks_message(user_id: str, text: str) -> None:
