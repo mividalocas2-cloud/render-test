@@ -78,13 +78,10 @@ def get_lineworks_access_token() -> str:
         },
     )
 
-    print("status:", res.status_code)
-    print("body:", res.text)
-
     # デバッグ用（一度だけ入れてOK）
     print("ここに結果が出る")
-    print(res.status_code)
-    print(res.text)
+    print("status:", res.status_code)
+    print("body:", res.text)
     print("結果出力終了")
 
     res.raise_for_status()
