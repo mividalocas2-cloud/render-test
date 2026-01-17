@@ -7,16 +7,18 @@ TOKEN_URL = "https://auth.worksmobile.com/oauth2/v2.0/token"
 
 def create_jwt():
     private_key = os.environ["LINEWORKS_PRIVATE_KEY"].replace("\\n", "\n")
+
+    service_account_id = os.environ["LINEWORKS_SERVICE_ACCOUNT_ID"]
     client_id = os.environ["LINEWORKS_CLIENT_ID"]
 
     now = int(time.time())
 
     payload = {
-        "iss": client_id,
-        "sub": client_id,
+        "iss": service_account_id,   # ← ここ！
+        "sub": service_account_id,   # ← ここ！
         "aud": TOKEN_URL,
         "iat": now,
-        "exp": now + 3600
+        "exp": now + 3600,
     }
 
     token = jwt.encode(
@@ -34,14 +36,12 @@ def get_access_token():
     data = {
         "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
         "assertion": assertion,
-        "client_id": os.environ["LINEWORKS_CLIENT_ID"],
+        "client_id": os.environ["LINEWORKS_CLIENT_ID"],        # ← client app
         "client_secret": os.environ["LINEWORKS_CLIENT_SECRET"],
         "scope": "bot"
     }
 
     res = requests.post(TOKEN_URL, data=data)
-
-    # エラー時に内容を確認できるようにする
     if res.status_code != 200:
         raise Exception(res.text)
 
