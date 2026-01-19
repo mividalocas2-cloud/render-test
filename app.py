@@ -43,10 +43,9 @@ def root():
         token_res.raise_for_status()
         access_token = token_res.json().get("access_token")
 
-        # 送信先URL: 
-        # 修正：ドメインを api.worksmobile.com に変更
-        send_url = f"https://api.worksmobile.com/v1.0/bots/{bot_id}/users/{target_user_id}/messages"
-        #https://www.worksapis.com/v1.0/bots/{botId}/users/{userId}/messages
+        # 2. ドキュメント通りのURL（www.worksmobile.com を使用）
+        # ※ developer/api/v2... というパスが重要です
+        send_url = f"https://www.worksmobile.com/developer/api/v2/bot/{bot_id}/users/{target_user_id}/messages"
         
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -56,7 +55,7 @@ def root():
         message_payload = {
             "content": {
                 "type": "text",
-                "text": "こんにちは！APIからのメッセージ送信に成功しました！"
+                "text": "送信テスト成功！"
             }
         }
         
