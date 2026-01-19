@@ -44,8 +44,8 @@ def root():
         access_token = token_res.json().get("access_token")
 
         # 送信先URL: 
-        # ドメインを www.lineworksapis.com に変更し、パスを v2 用に修正します
-        send_url = f"https://www.lineworksapis.com/v2/bot/{bot_id}/users/{target_user_id}/messages"
+        # 修正：ドメインを api.worksmobile.com に変更
+        send_url = f"https://api.worksmobile.com/v2/bot/{bot_id}/users/{target_user_id}/messages"
         
         headers = {
             "Authorization": f"Bearer {access_token}",
