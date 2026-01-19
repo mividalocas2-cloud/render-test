@@ -45,7 +45,7 @@ def root():
 
         # 2. ドキュメント通りのURL（www.worksmobile.com を使用）
         # ※ developer/api/v2... というパスが重要です
-        send_url = f"https://www.worksmobile.com/developer/api/v2/bot/{bot_id}/users/{target_user_id}/messages"
+        send_url = f"https://www.lineworksapis.com/v2/bot/{bot_id}/users/{target_user_id}/messages"
         
         headers = {
             "Authorization": f"Bearer {access_token}",
