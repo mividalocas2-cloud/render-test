@@ -44,8 +44,7 @@ def root():
         access_token = token_res.json().get("access_token")
 
         # 4. メッセージの送信 (Message API V2)
-        # 送信先URL: https://www.worksmobile.com/jp/docs/bot/v2/bot/{botId}/users/{userId}/messages
-        send_url = f"https://www.worksmobile.com/jp/docs/bot/v2/bot/{bot_id}/users/{target_user_id}/messages"
+        send_url = f"https://www.worksmobile.com/developer/api/v2/bot/{bot_id}/users/{target_user_id}/messages"
         
         headers = {
             "Authorization": f"Bearer {access_token}",
