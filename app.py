@@ -18,7 +18,7 @@ def root():
         private_key = os.environ["LINEWORKS_PRIVATE_KEY"].replace("\\n", "\n")
         bot_id = os.environ["LINEWORKS_BOT_ID"]
         # 送信先のユーザーID（テスト用に自分のIDを環境変数に入れるか直接記述）
-        target_user_id = os.environ.get("USER_ID", "toshiya.goto@works-826009")
+        target_user_id = "toshiya.goto@works-826009"
 
         now = int(time.time())
 
@@ -45,7 +45,8 @@ def root():
 
         # 送信先URL: 
         # 修正：ドメインを api.worksmobile.com に変更
-        send_url = f"https://api.worksmobile.com/v2/bot/{bot_id}/users/{target_user_id}/messages"
+        send_url = f"https://api.worksmobile.com/v1.0/bots/{bot_id}/users/{target_user_id}/messages"
+        #https://www.worksapis.com/v1.0/bots/{botId}/users/{userId}/messages
         
         headers = {
             "Authorization": f"Bearer {access_token}",
